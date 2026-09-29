@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولّد صفحات الهدايا NFC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            color: #f59e0b;
+            font-size: 24px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        p.sub {
+            color: #94a3b8;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #f59e0b;
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .row .form-group {
+            flex: 1;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 10px;
+        }
+
+        input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(245, 158, 11, 0.35);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-card">
+        <h1>🎁 مولّد صفحات الهدايا NFC</h1>
+        <p class="sub">أدخل بيانات العميل لتوليد ملف index.html فورًا</p>
+
+        <form id="giftForm">
+            <div class="row">
+                <div class="form-group">
+                    <label>اسم المهدى إليه</label>
+                    <input type="text" id="recipient" placeholder="مثال: أحمد" required>
+                </div>
+                <div class="form-group">
+                    <label>اسم المُهدي</label>
+                    <input type="text" id="sender" placeholder="مثال: والدك" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>نوع المناسبة</label>
+                    <select id="occasion">
+                        <option value="عيد ميلاد سعيد 🎂">عيد ميلاد 🎂</option>
+                        <option value="تخرج مبارك 🎓">تخرج 🎓</option>
+                        <option value="زواج مبارك 💍">زواج 💍</option>
+                        <option value="ذكرى سعيدة ❤️">ذكرى خاصة ❤️</option>
+                        <option value="مولود جديد 👶">مولود جديد 👶</option>
+                        <option value="هدية خاصة 🎁">عام / أخرى 🎁</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>نوع الخط العربي</label>
+                    <select id="fontFamily">
+                        <option value="'Tajawal', sans-serif">تجوال (عصري وفخم)</option>
+                        <option value="'Amiri', serif">أميري (كلاسيكي ورسمي)</option>
+                        <option value="'Cairo', sans-serif">القاهرة (حديث وواضح)</option>
+                        <option value="'Almarai', sans-serif">المراعي (بسيط ومريح)</option>
+                        <option value="'Aref Ruqaa', serif">رقعة (فني وتقليدي)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>لون التصميم الرئيسية (Theme Color)</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="themeColor" value="#f59e0b">
+                    <span id="colorHex" style="font-size: 14px; color: #94a3b8;">#f59e0b</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>رابط Google Drive (الملفات والذكريات)</label>
+                <input type="url" id="driveUrl" placeholder="https://drive.google.com/drive/folders/..." required>
+            </div>
+
+            <div class="form-group">
+                <label>رابط صورة الغلاف</label>
+                <input type="url" id="coverUrl" placeholder="https://images.unsplash.com/..." required>
+            </div>
+
+            <div class="form-group">
+                <label>الرسالة الخاصة</label>
+                <textarea id="message" rows="4" placeholder="اكتب نص إهداء العميل هنا..." required></textarea>
+            </div>
+
+            <button type="submit">⚡ إنشاء وتحميل الصفحة (index.html)</button>
+        </form>
+    </div>
+
+    <script>
+        // تحديث كود اللون عند التغيير
+        const colorInput = document.getElementById('themeColor');
+        const colorHex = document.getElementById('colorHex');
+        colorInput.addEventListener('input', (e) => {
+            colorHex.textContent = e.target.value;
+        });
+
+        // التعامل مع الإرسال لتوليد الملف
+        document.getElementById('giftForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const recipient = document.getElementById('recipient').value;
+            const sender = document.getElementById('sender').value;
+            const occasion = document.getElementById('occasion').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            const themeColor = document.getElementById('themeColor').value;
+            const driveUrl = document.getElementById('driveUrl').value;
+            const coverUrl = document.getElementById('coverUrl').value;
+            const message = document.getElementById('message').value;
+
+            // بناء كود HTML المولد
+            const generatedHtml = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هدية لـ ${recipient}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --accent: ${themeColor};
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: ${fontFamily};
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 50% 10%, ${themeColor}22 0%, transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: ${themeColor}20;
+            color: var(--accent);
+            border: 1px solid ${themeColor}40;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .cover-wrapper {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            border: 1px solid ${themeColor}40;
+            box-shadow: 0 8px 20px ${themeColor}20;
+        }
+
+        .cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-box {
+            background: rgba(15, 23, 42, 0.6);
+            border-right: 4px solid var(--accent);
+            padding: 18px 20px;
+            border-radius: 12px;
+            text-align: right;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #e2e8f0;
+            margin-bottom: 28px;
+            white-space: pre-line;
+        }
+
+        .btn-drive {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            background: var(--accent);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 24px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px ${themeColor}30;
+            transition: all 0.3s ease;
+        }
+
+        .btn-drive:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .footer {
+            margin-top: 32px;
+            font-size: 13px;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="badge">${occasion}</div>
+        <h1 class="title">إلى ${recipient} ❤️</h1>
+        <p class="subtitle">هدية خاصة مُقدمة من: ${sender}</p>
+
+        <div class="cover-wrapper">
+            <img src="${coverUrl}" alt="الغلاف" class="cover-image">
+        </div>
+
+        <div class="message-box">${message}</div>
+
+        <a href="${driveUrl}" target="_blank" class="btn-drive">
+            <span>📁 عرض الذكريات والملفات</span>
+        </a>
+
+        <div class="footer">
+            تمت البرمجة بحب ✦ NFC Gift
+        </div>
+    </div>
+
+</body>
+</html>`;
+
+            // تحميل الملف تلقائياً بأسلوب Blob
+            const blob = new Blob([generatedHtml], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'index.html';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+    </script>
+</body>
+</html>
