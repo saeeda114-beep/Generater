@@ -3,19 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مولّد صفحات الهدايا NFC</title>
+    <title>مولّد صفحات الهدايا NFC - المطور</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6366f1;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --border: #334155;
-        }
-
+        :root { --primary: #6366f1; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --border: #334155; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 30px 15px; display: flex; justify-content: center; }
         .form-card { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 600px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
@@ -34,28 +27,34 @@
         .tab-btn { flex: 1; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: #94a3b8; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; text-align: center; }
         .tab-btn.active { background: #f59e0b; color: #000; border-color: #f59e0b; }
 
-        button.submit-btn { width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; border: none; padding: 16px; font-size: 17px; font-weight: 700; border-radius: 12px; cursor: pointer; margin-top: 10px; }
+        .folder-preview { background: #0f172a; border: 1px dashed #f59e0b; padding: 12px; border-radius: 10px; margin-top: 10px; font-size: 13px; color: #f59e0b; text-align: center; }
+
+        button.submit-btn { width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; border: none; padding: 16px; font-size: 17px; font-weight: 700; border-radius: 12px; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div class="form-card">
         <h1>🎁 مولّد صفحات الهدايا NFC</h1>
-        <p class="sub">أدخل بيانات العميل لتوليد ملف index.html فوراً</p>
+        <p class="sub">أدخل بيانات العميل والمُعرّف لتوليد المجلد والصفحة</p>
 
         <form id="giftForm">
             <div class="row">
                 <div class="form-group">
                     <label>اسم المهدى إليه</label>
-                    <input type="text" id="recipient" placeholder="أحمد" required>
+                    <input type="text" id="recipient" placeholder="منى" required oninput="updateFolderPreview()">
                 </div>
                 <div class="form-group">
-                    <label>اسم المُهدي</label>
-                    <input type="text" id="sender" placeholder="والدك" required>
+                    <label>رقم العميل / الطلب (للتمييز الداخلي)</label>
+                    <input type="text" id="clientId" placeholder="101" required oninput="updateFolderPreview()">
                 </div>
             </div>
 
             <div class="row">
+                <div class="form-group">
+                    <label>اسم المُهدي</label>
+                    <input type="text" id="sender" placeholder="سارة" required>
+                </div>
                 <div class="form-group">
                     <label>نوع المناسبة</label>
                     <select id="occasion">
@@ -67,6 +66,9 @@
                         <option value="هدية خاصة 🎁">عام / أخرى 🎁</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="row">
                 <div class="form-group">
                     <label>نوع الخط</label>
                     <select id="fontFamily">
@@ -76,13 +78,12 @@
                         <option value="'Almarai', sans-serif">المراعي (بسيط)</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label>لون التصميم الرئيسية</label>
-                <div class="color-picker-wrapper">
-                    <input type="color" id="themeColor" value="#f59e0b">
-                    <span id="colorHex" style="font-size: 13px; color: #94a3b8;">#f59e0b</span>
+                <div class="form-group">
+                    <label>لون التصميم</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="themeColor" value="#f59e0b">
+                        <span id="colorHex" style="font-size: 13px; color: #94a3b8;">#f59e0b</span>
+                    </div>
                 </div>
             </div>
 
@@ -92,11 +93,7 @@
                     <div class="tab-btn active" onclick="switchImageSource('upload')">📱 من الاستديو</div>
                     <div class="tab-btn" onclick="switchImageSource('link')">🔗 رابط أو اسم ملف</div>
                 </div>
-
-                <!-- خيار 1: اختيار من الجوال -->
                 <input type="file" id="coverFile" accept="image/*">
-                
-                <!-- خيار 2: كتابة اسم ملف أو رابط -->
                 <input type="text" id="coverUrl" placeholder="cover.jpg أو رابط صورة..." style="display: none;">
             </div>
 
@@ -107,7 +104,12 @@
 
             <div class="form-group">
                 <label>الرسالة الخاصة</label>
-                <textarea id="message" rows="3" placeholder="اكتب نص إهداء العميل..." required></textarea>
+                <textarea id="message" rows="3" placeholder="اكتب نص الإهداء..." required></textarea>
+            </div>
+
+            <!-- المعاينة -->
+            <div class="folder-preview" id="folderPreview">
+                📁 اسم المجلد في جيت هب سيكون: <b>client-folder/index.html</b>
             </div>
 
             <button type="submit" class="submit-btn">⚡ إنشاء وتحميل الصفحة (index.html)</button>
@@ -136,6 +138,13 @@
             }
         }
 
+        function updateFolderPreview() {
+            const recipient = document.getElementById('recipient').value.trim().toLowerCase() || 'name';
+            const clientId = document.getElementById('clientId').value.trim() || '101';
+            const folderName = `${recipient}-${clientId}`;
+            document.getElementById('folderPreview').innerHTML = `📁 اسم المجلد في جيت هب سيكون:<br><b>${folderName}/index.html</b>`;
+        }
+
         document.getElementById('themeColor').addEventListener('input', (e) => {
             document.getElementById('colorHex').textContent = e.target.value;
         });
@@ -143,12 +152,11 @@
         document.getElementById('giftForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            let coverSrc = "cover.jpg"; // الافتراضي
+            let coverSrc = "cover.jpg";
 
             if (imageMode === 'upload') {
                 const fileInput = document.getElementById('coverFile');
                 if (fileInput.files && fileInput.files[0]) {
-                    // تحويل الصورة المرفوعة إلى Base64
                     coverSrc = await new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = (e) => resolve(e.target.result);
@@ -167,6 +175,7 @@
             const driveUrl = document.getElementById('driveUrl').value;
             const message = document.getElementById('message').value;
 
+            // كود الصفحة المنتجة (لا يظهر فيه رقم العميل للزائر إطلاقاً)
             const generatedHtml = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
