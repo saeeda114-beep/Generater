@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>إهداء إلى مربية الأجيال</title>
+    <meta name="description" content="شكراً لأنك لم تكوني مجرد معلمه بل كنتِ أثراً جميلاً سيبقى في الذاكرة">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="إهداء إلى مربية الأجيال">
+    <meta property="og:description" content="يوم المعلم العالمي — من إداريات مدرسة هارون الرشيد للطفولة المبكرة">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #0f172a; --card-bg: rgba(30, 41, 59, 0.85); --accent: #f59e0b; --on-accent: #0f172a; --text-main: #f8fafc; --text-muted: #94a3b8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); background-image: radial-gradient(circle at 50% 10%, #f59e0b22 0%, transparent 60%); }
+        .container { width: 100%; max-width: 480px; background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 28px 20px; text-align: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+        .badge { display: inline-block; padding: 6px 16px; background: #f59e0b20; color: var(--accent); border: 1px solid #f59e0b40; border-radius: 50px; font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+        .title { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 6px; overflow-wrap: anywhere; }
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+        .cover-wrapper { position: relative; width: 100%; height: 200px; border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid #f59e0b40; box-shadow: 0 8px 20px #f59e0b20; }
+        .cover-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* بدون صورة: زخرفة بين خطين */
+        .ornament { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 22px; }
+        .ornament::before, .ornament::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to left, transparent, #f59e0b80); }
+        .ornament::after { background: linear-gradient(to right, transparent, #f59e0b80); }
+        .emblem { display: block; flex-shrink: 0; }
+        .ornament .emblem { animation: spin 60s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .message-box { background: rgba(15, 23, 42, 0.6); border-right: 4px solid var(--accent); padding: 16px 18px; border-radius: 12px; text-align: right; font-size: 15px; line-height: 1.8; color: #e2e8f0; margin-bottom: 20px; white-space: pre-line; overflow-wrap: anywhere; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; margin-bottom: 20px; border: 1px solid #f59e0b60; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .btn-drive { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: var(--accent); color: var(--on-accent); text-decoration: none; padding: 14px 20px; font-size: 16px; font-weight: 700; border-radius: 14px; box-shadow: 0 10px 25px #f59e0b30; margin-top: 10px; }
+        .footer { margin-top: 24px; font-size: 12px; color: var(--text-muted); opacity: 0.7; }
+
+        /* شاشة الفتح */
+        .opener { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; background: var(--bg-color); background-image: radial-gradient(circle at 50% 40%, #f59e0b30 0%, transparent 65%); transition: opacity .6s ease, transform .6s ease; }
+        .opener.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
+        .opener .emblem { animation: spin 40s linear infinite; margin-bottom: 8px; }
+        .opener-occ { color: var(--accent); font-size: 15px; font-weight: 700; }
+        .opener-to { font-size: 24px; font-weight: 800; margin-bottom: 18px; text-align: center; overflow-wrap: anywhere; }
+        .opener-btn { background: var(--accent); color: var(--on-accent); border: none; padding: 14px 40px; font-size: 17px; font-weight: 700; border-radius: 50px; cursor: pointer; box-shadow: 0 0 0 0 #f59e0b80; animation: pulse 2s infinite; }
+        @keyframes pulse { 70% { box-shadow: 0 0 0 16px #f59e0b00; } 100% { box-shadow: 0 0 0 0 #f59e0b00; } }
+
+        /* زر الصوت العائم */
+        .audio-toggle { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 16px; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(15, 23, 42, 0.9); color: var(--text-main); border: 1px solid #f59e0b60; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .bars { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+        .bars i { width: 3px; height: 4px; background: var(--accent); border-radius: 2px; }
+        .audio-toggle.playing .bars i { animation: eq .9s ease-in-out infinite; }
+        .audio-toggle.playing .bars i:nth-child(2) { animation-delay: .2s; }
+        .audio-toggle.playing .bars i:nth-child(3) { animation-delay: .4s; }
+        @keyframes eq { 50% { height: 14px; } }
+
+        button:focus-visible, a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+    </style>
+</head>
+<body>
+    
+    <div class="opener" id="opener">
+        <svg class="emblem" width="110" height="110" viewBox="0 0 120 120" aria-hidden="true">
+                <g fill="none" stroke="#f59e0b" stroke-width="1.6">
+                    <rect x="27" y="27" width="66" height="66" rx="3"/>
+                    <rect x="27" y="27" width="66" height="66" rx="3" transform="rotate(45 60 60)"/>
+                    <circle cx="60" cy="60" r="22" stroke-opacity="0.6"/>
+                </g>
+                <circle cx="60" cy="60" r="14" fill="#f59e0b" fill-opacity="0.18"/>
+                <circle cx="60" cy="60" r="4" fill="#f59e0b"/>
+            </svg>
+        <p class="opener-occ">يوم المعلم العالمي</p>
+        <p class="opener-to">إلى مربية الأجيال</p>
+        <button type="button" class="opener-btn">افتح الإهداء</button>
+    </div>
+    <audio id="giftAudio" src="audio.m4a" preload="auto" loop></audio>
+    <button type="button" class="audio-toggle" id="audioToggle" aria-pressed="false">
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="lbl">تشغيل الصوت</span>
+    </button>
+    <main class="container">
+        <div class="badge">يوم المعلم العالمي</div>
+        <h1 class="title">إلى مربية الأجيال</h1>
+        <p class="subtitle">إهداء مقدم من: إداريات مدرسة هارون الرشيد للطفولة المبكرة</p>
+
+        <div class="ornament"><svg class="emblem" width="96" height="96" viewBox="0 0 120 120" aria-hidden="true">
+                <g fill="none" stroke="#f59e0b" stroke-width="1.6">
+                    <rect x="27" y="27" width="66" height="66" rx="3"/>
+                    <rect x="27" y="27" width="66" height="66" rx="3" transform="rotate(45 60 60)"/>
+                    <circle cx="60" cy="60" r="22" stroke-opacity="0.6"/>
+                </g>
+                <circle cx="60" cy="60" r="14" fill="#f59e0b" fill-opacity="0.18"/>
+                <circle cx="60" cy="60" r="4" fill="#f59e0b"/>
+            </svg></div>
+        <div class="message-box">شكراً لأنك لم تكوني مجرد معلمه بل كنتِ أثراً جميلاً سيبقى في الذاكرة</div>
+
+
+        <div class="footer">تمت البرمجة بحب ✦ NFC Gift</div>
+    </main>
+
+    <script>
+    (function () {
+        var a = document.getElementById('giftAudio');
+        var ov = document.getElementById('opener');
+        var tg = document.getElementById('audioToggle');
+        function sync() {
+            var on = !a.paused;
+            tg.setAttribute('aria-pressed', on);
+            tg.classList.toggle('playing', on);
+            tg.querySelector('.lbl').textContent = on ? 'إيقاف الصوت' : 'تشغيل الصوت';
+        }
+        ov.querySelector('button').addEventListener('click', function () {
+            a.play().catch(function () {});
+            ov.classList.add('hide');
+            setTimeout(function () { ov.remove(); }, 600);
+        });
+        tg.addEventListener('click', function () {
+            if (a.paused) { a.play().catch(function () {}); } else { a.pause(); }
+        });
+        a.addEventListener('play', sync);
+        a.addEventListener('pause', sync);
+        // إيقاف الصوت تلقائياً عند الضغط على الفيديو
+        window.addEventListener('blur', function () {
+            setTimeout(function () {
+                var el = document.activeElement;
+                if (el && el.tagName === 'IFRAME') a.pause();
+            }, 0);
+        });
+    })();
+    </script>
+</body>
+</html>
