@@ -397,7 +397,7 @@
 
             const videoSectionHtml = embedVideoUrl ? `
         <div class="video-container">
-            <iframe src="${esc(embedVideoUrl)}" title="فيديو الإهداء" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            <iframe src="${esc(embedVideoUrl)}" title="فيديو الإهداء" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
         </div>` : '';
 
             const driveBtnHtml = driveUrl ? `
@@ -462,6 +462,7 @@
     <meta property="og:title" content="إهداء إلى ${R}">
     <meta property="og:description" content="${O} — من ${S}">${ogImage}
     <meta name="theme-color" content="#0f172a">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=${font.q}&display=swap" rel="stylesheet">
