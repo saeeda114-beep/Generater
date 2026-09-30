@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مولّد صفحات الهدايا NFC - المطور</title>
+    <title>مولّد صفحات الهدايا NFC - المطور مع الفيديو</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
@@ -36,16 +36,16 @@
 
     <div class="form-card">
         <h1>🎁 مولّد صفحات الهدايا NFC</h1>
-        <p class="sub">أدخل بيانات العميل والمُعرّف لتوليد المجلد والصفحة</p>
+        <p class="sub">توليد بطاقة إهداء تفاعلية تدعم الفيديو المدمج والـ Drive</p>
 
         <form id="giftForm">
             <div class="row">
                 <div class="form-group">
-                    <label>اسم المهدى إليه</label>
-                    <input type="text" id="recipient" placeholder="منى" required oninput="updateFolderPreview()">
+                    <label>اسم المهدى إليه (المعلم/العميل)</label>
+                    <input type="text" id="recipient" placeholder="أ. محمد العلي" required oninput="updateFolderPreview()">
                 </div>
                 <div class="form-group">
-                    <label>رقم العميل / الطلب (للتمييز الداخلي)</label>
+                    <label>رقم المعلم/العميل (للتمييز الداخلي)</label>
                     <input type="text" id="clientId" placeholder="101" required oninput="updateFolderPreview()">
                 </div>
             </div>
@@ -53,16 +53,16 @@
             <div class="row">
                 <div class="form-group">
                     <label>اسم المُهدي</label>
-                    <input type="text" id="sender" placeholder="سارة" required>
+                    <input type="text" id="sender" placeholder="طلاب الصف السادس" required>
                 </div>
                 <div class="form-group">
                     <label>نوع المناسبة</label>
                     <select id="occasion">
+                        <option value="يوم المعلم العالمي 👨‍🏫">يوم المعلم 👨‍‍🏫</option>
                         <option value="عيد ميلاد سعيد 🎂">عيد ميلاد 🎂</option>
                         <option value="تخرج مبارك 🎓">تخرج 🎓</option>
                         <option value="زواج مبارك 💍">زواج 💍</option>
                         <option value="ذكرى سعيدة ❤️">ذكرى خاصة ❤️</option>
-                        <option value="مولود جديد 👶">مولود جديد 👶</option>
                         <option value="هدية خاصة 🎁">عام / أخرى 🎁</option>
                     </select>
                 </div>
@@ -97,14 +97,20 @@
                 <input type="text" id="coverUrl" placeholder="cover.jpg أو رابط صورة..." style="display: none;">
             </div>
 
+            <!-- خيار الفيديو المدمج الجديد -->
             <div class="form-group">
-                <label>رابط Google Drive</label>
-                <input type="url" id="driveUrl" placeholder="https://drive.google.com/..." required>
+                <label>🎬 رابط فيديو الإهداء (YouTube أو Vimeo)</label>
+                <input type="url" id="videoUrl" placeholder="https://youtu.be/hKseespeT_g أو https://vimeo.com/...">
+            </div>
+
+            <div class="form-group">
+                <label>📁 رابط Google Drive (اختياري)</label>
+                <input type="url" id="driveUrl" placeholder="https://drive.google.com/...">
             </div>
 
             <div class="form-group">
                 <label>الرسالة الخاصة</label>
-                <textarea id="message" rows="3" placeholder="اكتب نص الإهداء..." required></textarea>
+                <textarea id="message" rows="3" placeholder="اكتب نص الإهداء والتكريم هنا..." required></textarea>
             </div>
 
             <!-- المعاينة -->
@@ -139,10 +145,31 @@
         }
 
         function updateFolderPreview() {
-            const recipient = document.getElementById('recipient').value.trim().toLowerCase() || 'name';
+            const recipient = document.getElementById('recipient').value.trim().toLowerCase().replace(/\s+/g, '-') || 'name';
             const clientId = document.getElementById('clientId').value.trim() || '101';
             const folderName = `${recipient}-${clientId}`;
             document.getElementById('folderPreview').innerHTML = `📁 اسم المجلد في جيت هب سيكون:<br><b>${folderName}/index.html</b>`;
+        }
+
+        // دالة تحويل رابط يوتيوب وفيمو إلى رابط تضمين بدون إعلانات
+        function getEmbedUrl(url) {
+            if (!url) return null;
+            
+            // YouTube Regex
+            const ytReg = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+            const ytMatch = url.match(ytReg);
+            if (ytMatch && ytMatch[1]) {
+                return `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?rel=0`;
+            }
+
+            // Vimeo Regex
+            const vimeoReg = /(?:vimeo\.com\/)(\d+)/;
+            const vimeoMatch = url.match(vimeoReg);
+            if (vimeoMatch && vimeoMatch[1]) {
+                return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+            }
+
+            return null;
         }
 
         document.getElementById('themeColor').addEventListener('input', (e) => {
@@ -172,39 +199,62 @@
             const occasion = document.getElementById('occasion').value;
             const fontFamily = document.getElementById('fontFamily').value;
             const themeColor = document.getElementById('themeColor').value;
-            const driveUrl = document.getElementById('driveUrl').value;
+            const rawVideoUrl = document.getElementById('videoUrl').value.trim();
+            const driveUrl = document.getElementById('driveUrl').value.trim();
             const message = document.getElementById('message').value;
 
-            // كود الصفحة المنتجة (لا يظهر فيه رقم العميل للزائر إطلاقاً)
+            const embedVideoUrl = getEmbedUrl(rawVideoUrl);
+
+            // تجهيز قسم الفيديو في HTML إذا وُجد
+            let videoSectionHtml = '';
+            if (embedVideoUrl) {
+                videoSectionHtml = `
+        <div class="video-container">
+            <iframe src="${embedVideoUrl}" title="فيديو الإهداء" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>`;
+            }
+
+            // تجهيز زر درايف إذا وُجد
+            let driveBtnHtml = '';
+            if (driveUrl) {
+                driveBtnHtml = `
+        <a href="${driveUrl}" target="_blank" class="btn-drive">
+            <span>📁 عرض الذكريات والملفات</span>
+        </a>`;
+            }
+
+            // كود الصفحة المنتجة
             const generatedHtml = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هدية لـ ${recipient}</title>
+    <title>إهداء إلى ${recipient}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Cairo:wght@400;700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-color: #0f172a; --card-bg: rgba(30, 41, 59, 0.75); --accent: ${themeColor}; --text-main: #f8fafc; --text-muted: #94a3b8; }
+        :root { --bg-color: #0f172a; --card-bg: rgba(30, 41, 59, 0.85); --accent: ${themeColor}; --text-main: #f8fafc; --text-muted: #94a3b8; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: ${fontFamily}; }
         body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background-image: radial-gradient(circle at 50% 10%, ${themeColor}22 0%, transparent 60%); }
-        .container { width: 100%; max-width: 480px; background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+        .container { width: 100%; max-width: 480px; background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 28px 20px; text-align: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
         .badge { display: inline-block; padding: 6px 16px; background: ${themeColor}20; color: var(--accent); border: 1px solid ${themeColor}40; border-radius: 50px; font-size: 14px; font-weight: 700; margin-bottom: 16px; }
-        .title { font-size: 28px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
-        .subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; }
-        .cover-wrapper { position: relative; width: 100%; height: 220px; border-radius: 16px; overflow: hidden; margin-bottom: 24px; border: 1px solid ${themeColor}40; box-shadow: 0 8px 20px ${themeColor}20; }
+        .title { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+        .cover-wrapper { position: relative; width: 100%; height: 200px; border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid ${themeColor}40; box-shadow: 0 8px 20px ${themeColor}20; }
         .cover-image { width: 100%; height: 100%; object-fit: cover; }
-        .message-box { background: rgba(15, 23, 42, 0.6); border-right: 4px solid var(--accent); padding: 18px 20px; border-radius: 12px; text-align: right; font-size: 16px; line-height: 1.8; color: #e2e8f0; margin-bottom: 28px; white-space: pre-line; }
-        .btn-drive { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: var(--accent); color: #ffffff; text-decoration: none; padding: 16px 24px; font-size: 18px; font-weight: 700; border-radius: 14px; box-shadow: 0 10px 25px ${themeColor}30; transition: all 0.3s ease; }
-        .footer { margin-top: 32px; font-size: 13px; color: var(--text-muted); opacity: 0.7; }
+        .message-box { background: rgba(15, 23, 42, 0.6); border-right: 4px solid var(--accent); padding: 16px 18px; border-radius: 12px; text-align: right; font-size: 15px; line-height: 1.8; color: #e2e8f0; margin-bottom: 20px; white-space: pre-line; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; margin-bottom: 20px; border: 1px solid ${themeColor}60; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0; }
+        .btn-drive { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: var(--accent); color: #ffffff; text-decoration: none; padding: 14px 20px; font-size: 16px; font-weight: 700; border-radius: 14px; box-shadow: 0 10px 25px ${themeColor}30; margin-top: 10px; }
+        .footer { margin-top: 24px; font-size: 12px; color: var(--text-muted); opacity: 0.7; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="badge">${occasion}</div>
         <h1 class="title">إلى ${recipient} ❤️</h1>
-        <p class="subtitle">هدية خاصة مُقدمة من: ${sender}</p>
+        <p class="subtitle">إهداء مقدم من: ${sender}</p>
 
         <div class="cover-wrapper">
             <img src="${coverSrc}" alt="الغلاف" class="cover-image">
@@ -212,9 +262,9 @@
 
         <div class="message-box">${message}</div>
 
-        <a href="${driveUrl}" target="_blank" class="btn-drive">
-            <span>📁 عرض الذكريات والملفات</span>
-        </a>
+        ${videoSectionHtml}
+
+        ${driveBtnHtml}
 
         <div class="footer">
             تمت البرمجة بحب ✦ NFC Gift
