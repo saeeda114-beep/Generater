@@ -3,83 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مولّد صفحات الهدايا NFC - المطور مع الفيديو</title>
+    <title>مولّد صفحات الهدايا NFC</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6366f1; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --border: #334155; }
+        :root { --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --border: #334155; --accent: #f59e0b; --danger: #f87171; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 30px 15px; display: flex; justify-content: center; }
         .form-card { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 600px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        h1 { color: #f59e0b; font-size: 22px; margin-bottom: 6px; text-align: center; }
+        h1 { color: var(--accent); font-size: 22px; margin-bottom: 6px; text-align: center; }
         p.sub { color: #94a3b8; font-size: 13px; text-align: center; margin-bottom: 24px; }
         .form-group { margin-bottom: 16px; }
         label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1; }
+        .hint { display: block; font-size: 12px; color: #64748b; margin-top: 5px; line-height: 1.6; }
         input, textarea, select { width: 100%; padding: 12px; background-color: #0f172a; border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
-        input:focus, textarea:focus, select:focus { border-color: #f59e0b; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+        input.invalid { border-color: var(--danger); }
+        #occasionCustom { margin-top: 8px; }
         .row { display: flex; gap: 12px; }
-        .row .form-group { flex: 1; }
+        .row .form-group { flex: 1; min-width: 0; }
+        @media (max-width: 480px) { .row { flex-direction: column; gap: 0; } }
         .color-picker-wrapper { display: flex; align-items: center; gap: 12px; background: #0f172a; border: 1px solid var(--border); padding: 6px 12px; border-radius: 10px; }
         input[type="color"] { width: 36px; height: 36px; border: none; cursor: pointer; background: transparent; padding: 0; }
-        
+        .check-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: #cbd5e1; cursor: pointer; }
+        .check-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+
         .image-option-tabs { display: flex; gap: 8px; margin-bottom: 8px; }
         .tab-btn { flex: 1; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: #94a3b8; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; text-align: center; }
-        .tab-btn.active { background: #f59e0b; color: #000; border-color: #f59e0b; }
+        .tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .tab-btn:focus-visible, button.submit-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-        .folder-preview { background: #0f172a; border: 1px dashed #f59e0b; padding: 12px; border-radius: 10px; margin-top: 10px; font-size: 13px; color: #f59e0b; text-align: center; }
+        .folder-preview { background: #0f172a; border: 1px dashed var(--accent); padding: 12px; border-radius: 10px; margin-top: 10px; font-size: 13px; color: var(--accent); text-align: center; line-height: 1.8; }
+        .folder-preview b { direction: ltr; unicode-bidi: embed; }
+
+        .error-box { display: none; background: rgba(248,113,113,0.1); border: 1px solid var(--danger); color: var(--danger); padding: 12px; border-radius: 10px; font-size: 13px; margin-top: 12px; line-height: 1.7; }
+        .error-box.show { display: block; }
 
         button.submit-btn { width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; border: none; padding: 16px; font-size: 17px; font-weight: 700; border-radius: 12px; cursor: pointer; margin-top: 15px; }
+        button.submit-btn:disabled { opacity: 0.6; cursor: wait; }
     </style>
 </head>
 <body>
 
     <div class="form-card">
         <h1>🎁 مولّد صفحات الهدايا NFC</h1>
-        <p class="sub">توليد بطاقة إهداء تفاعلية تدعم الفيديو المدمج والـ Drive</p>
+        <p class="sub">توليد بطاقة إهداء تفاعلية تدعم الفيديو والصوت والـ Drive</p>
 
-        <form id="giftForm">
+        <form id="giftForm" novalidate>
             <div class="row">
                 <div class="form-group">
-                    <label>اسم المهدى إليه (المعلم/العميل)</label>
-                    <input type="text" id="recipient" placeholder="أ. محمد العلي" required oninput="updateFolderPreview()">
+                    <label for="recipient">اسم المهدى إليه (المعلم/العميل)</label>
+                    <input type="text" id="recipient" placeholder="أ. محمد العلي" required maxlength="60">
                 </div>
                 <div class="form-group">
-                    <label>رقم المعلم/العميل (للتمييز الداخلي)</label>
-                    <input type="text" id="clientId" placeholder="101" required oninput="updateFolderPreview()">
+                    <label for="clientId">رقم المعلم/العميل</label>
+                    <input type="text" id="clientId" placeholder="101" required maxlength="20" inputmode="numeric">
+                    <span class="hint">يُستخدم في اسم المجلد</span>
                 </div>
             </div>
 
             <div class="row">
                 <div class="form-group">
-                    <label>اسم المُهدي</label>
-                    <input type="text" id="sender" placeholder="طلاب الصف السادس" required>
+                    <label for="sender">اسم المُهدي</label>
+                    <input type="text" id="sender" placeholder="طلاب الصف الثالث المتوسط" required maxlength="60">
                 </div>
                 <div class="form-group">
-                    <label>نوع المناسبة</label>
+                    <label for="occasion">نوع المناسبة</label>
                     <select id="occasion">
-                        <option value="يوم المعلم العالمي 👨‍🏫">يوم المعلم 👨‍‍🏫</option>
-                        <option value="عيد ميلاد سعيد 🎂">عيد ميلاد 🎂</option>
-                        <option value="تخرج مبارك 🎓">تخرج 🎓</option>
-                        <option value="زواج مبارك 💍">زواج 💍</option>
-                        <option value="ذكرى سعيدة ❤️">ذكرى خاصة ❤️</option>
-                        <option value="هدية خاصة 🎁">عام / أخرى 🎁</option>
+                        <option value="يوم المعلم العالمي">يوم المعلم</option>
+                        <option value="عيد ميلاد سعيد">عيد ميلاد</option>
+                        <option value="تخرج مبارك">تخرج</option>
+                        <option value="زواج مبارك">زواج</option>
+                        <option value="ذكرى سعيدة">ذكرى خاصة</option>
+                        <option value="هدية خاصة">عام</option>
+                        <option value="__custom">أخرى (اكتبها بنفسك)</option>
                     </select>
+                    <input type="text" id="occasionCustom" placeholder="مثال: تكريم التميز" maxlength="40" style="display: none;">
                 </div>
             </div>
 
             <div class="row">
                 <div class="form-group">
-                    <label>نوع الخط</label>
+                    <label for="fontFamily">نوع الخط</label>
                     <select id="fontFamily">
-                        <option value="'Tajawal', sans-serif">تجوال (فخم)</option>
-                        <option value="'Amiri', serif">أميري (كلاسيكي)</option>
-                        <option value="'Cairo', sans-serif">القاهرة (حديث)</option>
-                        <option value="'Almarai', sans-serif">المراعي (بسيط)</option>
+                        <option value="Tajawal">تجوال (فخم)</option>
+                        <option value="Amiri">أميري (كلاسيكي)</option>
+                        <option value="Cairo">القاهرة (حديث)</option>
+                        <option value="Almarai">المراعي (بسيط)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>لون التصميم</label>
+                    <label for="themeColor">لون التصميم</label>
                     <div class="color-picker-wrapper">
                         <input type="color" id="themeColor" value="#f59e0b">
                         <span id="colorHex" style="font-size: 13px; color: #94a3b8;">#f59e0b</span>
@@ -88,197 +103,440 @@
             </div>
 
             <div class="form-group">
-                <label>صورة الغلاف</label>
-                <div class="image-option-tabs">
-                    <div class="tab-btn active" onclick="switchImageSource('upload')">📱 من الاستديو</div>
-                    <div class="tab-btn" onclick="switchImageSource('link')">🔗 رابط أو اسم ملف</div>
+                <label>صورة الغلاف (اختياري)</label>
+                <div class="image-option-tabs" role="tablist">
+                    <button type="button" class="tab-btn active" data-group="cover" data-mode="upload" role="tab" aria-selected="true">📱 من الاستديو</button>
+                    <button type="button" class="tab-btn" data-group="cover" data-mode="link" role="tab" aria-selected="false">🔗 رابط أو اسم ملف</button>
                 </div>
-                <input type="file" id="coverFile" accept="image/*">
-                <input type="text" id="coverUrl" placeholder="cover.jpg أو رابط صورة..." style="display: none;">
-            </div>
-
-            <!-- خيار الفيديو المدمج الجديد -->
-            <div class="form-group">
-                <label>🎬 رابط فيديو الإهداء (YouTube أو Vimeo)</label>
-                <input type="url" id="videoUrl" placeholder="https://youtu.be/hKseespeT_g أو https://vimeo.com/...">
+                <input type="file" id="coverFile" accept="image/jpeg,image/png,image/webp">
+                <input type="text" id="coverUrl" placeholder="cover.jpg أو https://..." style="display: none;" dir="ltr">
+                <span class="hint" id="coverHint">تُضغط الصورة تلقائياً. بدون صورة تظهر زخرفة بلون التصميم</span>
             </div>
 
             <div class="form-group">
-                <label>📁 رابط Google Drive (اختياري)</label>
-                <input type="url" id="driveUrl" placeholder="https://drive.google.com/...">
+                <label>🎵 صوت الإهداء (اختياري)</label>
+                <div class="image-option-tabs" role="tablist">
+                    <button type="button" class="tab-btn active" data-group="audio" data-mode="upload" role="tab" aria-selected="true">📱 رفع ملف صوتي</button>
+                    <button type="button" class="tab-btn" data-group="audio" data-mode="link" role="tab" aria-selected="false">🔗 رابط أو اسم ملف</button>
+                </div>
+                <input type="file" id="audioFile" accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,.mp3,.m4a">
+                <input type="text" id="audioUrl" placeholder="audio.mp3 أو https://..." style="display: none;" dir="ltr">
+                <span class="hint" id="audioHint">MP3 أو M4A بحد أقصى 3 ميجا. يبدأ التشغيل عند ضغط زر "افتح الإهداء"</span>
+                <label class="check-row"><input type="checkbox" id="audioLoop" checked> تكرار الصوت</label>
             </div>
 
             <div class="form-group">
-                <label>الرسالة الخاصة</label>
-                <textarea id="message" rows="3" placeholder="اكتب نص الإهداء والتكريم هنا..." required></textarea>
+                <label for="videoUrl">🎬 رابط فيديو الإهداء (YouTube أو Vimeo) — اختياري</label>
+                <input type="url" id="videoUrl" placeholder="https://youtu.be/... أو youtube.com/shorts/..." dir="ltr">
             </div>
 
-            <!-- المعاينة -->
-            <div class="folder-preview" id="folderPreview">
-                📁 اسم المجلد في جيت هب سيكون: <b>client-folder/index.html</b>
+            <div class="form-group">
+                <label for="driveUrl">📁 رابط Google Drive (اختياري)</label>
+                <input type="url" id="driveUrl" placeholder="https://drive.google.com/..." dir="ltr">
             </div>
 
-            <button type="submit" class="submit-btn">⚡ إنشاء وتحميل الصفحة (index.html)</button>
+            <div class="form-group">
+                <label for="message">الرسالة الخاصة</label>
+                <textarea id="message" rows="4" placeholder="اكتب نص الإهداء والتكريم هنا..." required maxlength="1500"></textarea>
+            </div>
+
+            <div class="folder-preview" id="folderPreview"></div>
+
+            <div class="error-box" id="errorBox" role="alert"></div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">⚡ إنشاء وتحميل الصفحة (index.html)</button>
         </form>
     </div>
 
     <script>
-        let imageMode = 'upload';
+        const modes = { cover: 'upload', audio: 'upload' };
+        const $ = (id) => document.getElementById(id);
+        const MAX_AUDIO_MB = 3;
 
-        function switchImageSource(mode) {
-            imageMode = mode;
-            const fileInput = document.getElementById('coverFile');
-            const urlInput = document.getElementById('coverUrl');
-            const tabs = document.querySelectorAll('.tab-btn');
-
-            if (mode === 'upload') {
-                fileInput.style.display = 'block';
-                urlInput.style.display = 'none';
-                tabs[0].classList.add('active');
-                tabs[1].classList.remove('active');
-            } else {
-                fileInput.style.display = 'none';
-                urlInput.style.display = 'block';
-                tabs[1].classList.add('active');
-                tabs[0].classList.remove('active');
-            }
+        // ===== أدوات الأمان =====
+        function esc(s) {
+            return String(s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function isHttpsUrl(u) {
+            try { return new URL(u).protocol === 'https:'; } catch { return false; }
+        }
+        function isLocalFile(u, exts) {
+            return new RegExp(`^[\\w\\-.]+\\.(${exts})$`, 'i').test(u);
+        }
+        function safeColor(c) {
+            return /^#[0-9a-f]{6}$/i.test(c) ? c : '#f59e0b';
         }
 
+        // ===== اسم المجلد =====
+        function slugify(s) {
+            return String(s).toLowerCase().normalize('NFKD')
+                .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        }
+        function getFolderName() {
+            const idSlug = slugify($('clientId').value) || '101';
+            const nameSlug = slugify($('recipient').value);
+            return nameSlug ? `${nameSlug}-${idSlug}` : `gift-${idSlug}`;
+        }
         function updateFolderPreview() {
-            const recipient = document.getElementById('recipient').value.trim().toLowerCase().replace(/\s+/g, '-') || 'name';
-            const clientId = document.getElementById('clientId').value.trim() || '101';
-            const folderName = `${recipient}-${clientId}`;
-            document.getElementById('folderPreview').innerHTML = `📁 اسم المجلد في جيت هب سيكون:<br><b>${folderName}/index.html</b>`;
+            const box = $('folderPreview');
+            box.textContent = '📁 اسم المجلد في GitHub:';
+            box.appendChild(document.createElement('br'));
+            const b = document.createElement('b');
+            b.textContent = `${getFolderName()}/index.html`;
+            box.appendChild(b);
         }
 
-        // دالة تحويل رابط يوتيوب وفيمو إلى رابط تضمين بدون إعلانات
+        // ===== التبويبات (الصورة والصوت) =====
+        const TAB_FIELDS = {
+            cover: { file: 'coverFile', url: 'coverUrl' },
+            audio: { file: 'audioFile', url: 'audioUrl' }
+        };
+        function switchTab(group, mode) {
+            modes[group] = mode;
+            const f = TAB_FIELDS[group];
+            $(f.file).style.display = mode === 'upload' ? 'block' : 'none';
+            $(f.url).style.display = mode === 'link' ? 'block' : 'none';
+            document.querySelectorAll(`.tab-btn[data-group="${group}"]`).forEach(t => {
+                const on = t.dataset.mode === mode;
+                t.classList.toggle('active', on);
+                t.setAttribute('aria-selected', on);
+            });
+        }
+        document.querySelectorAll('.tab-btn').forEach(t =>
+            t.addEventListener('click', () => switchTab(t.dataset.group, t.dataset.mode)));
+
+        // ===== المناسبة المخصصة =====
+        $('occasion').addEventListener('change', () => {
+            const custom = $('occasion').value === '__custom';
+            $('occasionCustom').style.display = custom ? 'block' : 'none';
+            if (custom) $('occasionCustom').focus();
+        });
+
+        // ===== ضغط الصورة =====
+        function compressImage(file, maxSize = 1000, quality = 0.8) {
+            return new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.round(img.width * scale);
+                    canvas.height = Math.round(img.height * scale);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    URL.revokeObjectURL(url);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')); };
+                img.src = url;
+            });
+        }
+
+        function readAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const r = new FileReader();
+                r.onload = () => resolve(r.result);
+                r.onerror = () => reject(new Error('read failed'));
+                r.readAsDataURL(file);
+            });
+        }
+
+        // ===== روابط الفيديو =====
         function getEmbedUrl(url) {
             if (!url) return null;
-            
-            // YouTube Regex
-            const ytReg = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-            const ytMatch = url.match(ytReg);
-            if (ytMatch && ytMatch[1]) {
-                return `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?rel=0`;
+            const yt = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+            if (yt) return `https://www.youtube-nocookie.com/embed/${yt[1]}?rel=0`;
+            const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([a-z0-9]+))?/i);
+            if (vm) {
+                const hashParam = url.match(/[?&]h=([a-z0-9]+)/i);
+                const hash = vm[2] || (hashParam && hashParam[1]);
+                return `https://player.vimeo.com/video/${vm[1]}${hash ? `?h=${hash}` : ''}`;
             }
-
-            // Vimeo Regex
-            const vimeoReg = /(?:vimeo\.com\/)(\d+)/;
-            const vimeoMatch = url.match(vimeoReg);
-            if (vimeoMatch && vimeoMatch[1]) {
-                return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-            }
-
             return null;
         }
 
-        document.getElementById('themeColor').addEventListener('input', (e) => {
-            document.getElementById('colorHex').textContent = e.target.value;
-        });
+        // ===== تباين لون النص =====
+        function textOn(hex) {
+            const n = parseInt(hex.slice(1), 16);
+            const [r, g, b] = [n >> 16, (n >> 8) & 255, n & 255].map(v => {
+                v /= 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) > 0.4 ? '#0f172a' : '#ffffff';
+        }
 
-        document.getElementById('giftForm').addEventListener('submit', async function(e) {
+        const FONTS = {
+            Tajawal: { css: "'Tajawal', sans-serif", q: 'Tajawal:wght@400;700;800' },
+            Amiri:   { css: "'Amiri', serif",        q: 'Amiri:wght@400;700' },
+            Cairo:   { css: "'Cairo', sans-serif",   q: 'Cairo:wght@400;700;800' },
+            Almarai: { css: "'Almarai', sans-serif", q: 'Almarai:wght@400;700;800' }
+        };
+
+        // ===== الأخطاء =====
+        function showErrors(list) {
+            const box = $('errorBox');
+            box.textContent = '';
+            if (!list.length) { box.classList.remove('show'); return; }
+            list.forEach(msg => {
+                const line = document.createElement('div');
+                line.textContent = '• ' + msg;
+                box.appendChild(line);
+            });
+            box.classList.add('show');
+            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function mark(id, bad) { $(id).classList.toggle('invalid', bad); }
+
+        $('recipient').addEventListener('input', updateFolderPreview);
+        $('clientId').addEventListener('input', updateFolderPreview);
+        $('themeColor').addEventListener('input', e => { $('colorHex').textContent = e.target.value; });
+        updateFolderPreview();
+
+        // ===== الإنشاء =====
+        $('giftForm').addEventListener('submit', async function (e) {
             e.preventDefault();
+            const errors = [];
 
-            let coverSrc = "cover.jpg";
+            const recipient = $('recipient').value.trim();
+            const clientId  = $('clientId').value.trim();
+            const sender    = $('sender').value.trim();
+            const message   = $('message').value.trim();
+            const isCustomOcc = $('occasion').value === '__custom';
+            const occasion  = isCustomOcc ? $('occasionCustom').value.trim() : $('occasion').value;
+            const font      = FONTS[$('fontFamily').value] || FONTS.Tajawal;
+            const themeColor = safeColor($('themeColor').value);
+            const btnText   = textOn(themeColor);
+            const rawVideoUrl = $('videoUrl').value.trim();
+            const driveUrl  = $('driveUrl').value.trim();
+            const audioLoop = $('audioLoop').checked;
 
-            if (imageMode === 'upload') {
-                const fileInput = document.getElementById('coverFile');
-                if (fileInput.files && fileInput.files[0]) {
-                    coverSrc = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.readAsDataURL(fileInput.files[0]);
-                    });
-                }
-            } else {
-                coverSrc = document.getElementById('coverUrl').value || "cover.jpg";
-            }
+            [['recipient', recipient, 'اكتب اسم المهدى إليه'],
+             ['clientId', clientId, 'اكتب رقم المعلم/العميل'],
+             ['sender', sender, 'اكتب اسم المُهدي'],
+             ['message', message, 'اكتب نص الرسالة']]
+            .forEach(([id, val, msg]) => { mark(id, !val); if (!val) errors.push(msg); });
 
-            const recipient = document.getElementById('recipient').value;
-            const sender = document.getElementById('sender').value;
-            const occasion = document.getElementById('occasion').value;
-            const fontFamily = document.getElementById('fontFamily').value;
-            const themeColor = document.getElementById('themeColor').value;
-            const rawVideoUrl = document.getElementById('videoUrl').value.trim();
-            const driveUrl = document.getElementById('driveUrl').value.trim();
-            const message = document.getElementById('message').value;
+            mark('occasionCustom', isCustomOcc && !occasion);
+            if (isCustomOcc && !occasion) errors.push('اكتب نوع المناسبة');
 
             const embedVideoUrl = getEmbedUrl(rawVideoUrl);
+            const badVideo = rawVideoUrl && !embedVideoUrl;
+            mark('videoUrl', badVideo);
+            if (badVideo) errors.push('رابط الفيديو غير مدعوم. استخدم رابط YouTube أو Vimeo صحيح');
 
-            // تجهيز قسم الفيديو في HTML إذا وُجد
-            let videoSectionHtml = '';
-            if (embedVideoUrl) {
-                videoSectionHtml = `
+            const badDrive = driveUrl && !isHttpsUrl(driveUrl);
+            mark('driveUrl', badDrive);
+            if (badDrive) errors.push('رابط Drive يجب أن يبدأ بـ https://');
+
+            // الغلاف
+            let coverSrc = '';
+            if (modes.cover === 'upload') {
+                const f = $('coverFile').files[0];
+                if (f) {
+                    try { coverSrc = await compressImage(f); }
+                    catch { errors.push('تعذّر قراءة الصورة. جرّب JPG أو PNG (صور HEIC من الآيفون قد لا تُقرأ)'); }
+                }
+            } else {
+                const u = $('coverUrl').value.trim();
+                const bad = u && !isHttpsUrl(u) && !isLocalFile(u, 'jpe?g|png|webp|gif');
+                mark('coverUrl', bad);
+                if (bad) errors.push('رابط الصورة يجب أن يبدأ بـ https:// أو يكون اسم ملف مثل cover.jpg');
+                else coverSrc = u;
+            }
+
+            // الصوت
+            let audioSrc = '';
+            if (modes.audio === 'upload') {
+                const f = $('audioFile').files[0];
+                if (f) {
+                    if (f.size > MAX_AUDIO_MB * 1024 * 1024) {
+                        errors.push(`حجم الملف الصوتي أكبر من ${MAX_AUDIO_MB} ميجا. قصّه أو ارفعه على GitHub واستخدم تبويب "رابط"`);
+                    } else {
+                        try { audioSrc = await readAsDataUrl(f); }
+                        catch { errors.push('تعذّر قراءة الملف الصوتي'); }
+                    }
+                }
+            } else {
+                const u = $('audioUrl').value.trim();
+                const bad = u && !isHttpsUrl(u) && !isLocalFile(u, 'mp3|m4a|aac');
+                mark('audioUrl', bad);
+                if (bad) errors.push('رابط الصوت يجب أن يبدأ بـ https:// أو يكون اسم ملف مثل audio.mp3');
+                else audioSrc = u;
+            }
+
+            showErrors(errors);
+            if (errors.length) return;
+            $('submitBtn').disabled = true;
+
+            const R = esc(recipient), S = esc(sender), M = esc(message), O = esc(occasion);
+            const desc = esc(message.replace(/\s+/g, ' ').slice(0, 150));
+
+            // زخرفة نجمة ثمانية تُستخدم عند غياب الصورة وفي شاشة الفتح
+            const emblemSvg = (size) => `<svg class="emblem" width="${size}" height="${size}" viewBox="0 0 120 120" aria-hidden="true">
+                <g fill="none" stroke="${themeColor}" stroke-width="1.6">
+                    <rect x="27" y="27" width="66" height="66" rx="3"/>
+                    <rect x="27" y="27" width="66" height="66" rx="3" transform="rotate(45 60 60)"/>
+                    <circle cx="60" cy="60" r="22" stroke-opacity="0.6"/>
+                </g>
+                <circle cx="60" cy="60" r="14" fill="${themeColor}" fill-opacity="0.18"/>
+                <circle cx="60" cy="60" r="4" fill="${themeColor}"/>
+            </svg>`;
+
+            const coverHtml = coverSrc ? `
+        <div class="cover-wrapper">
+            <img src="${esc(coverSrc)}" alt="صورة الإهداء" class="cover-image">
+        </div>` : `
+        <div class="ornament">${emblemSvg(96)}</div>`;
+
+            const ogImage = isHttpsUrl(coverSrc) ? `
+    <meta property="og:image" content="${esc(coverSrc)}">` : '';
+
+            const videoSectionHtml = embedVideoUrl ? `
         <div class="video-container">
-            <iframe src="${embedVideoUrl}" title="فيديو الإهداء" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>`;
-            }
+            <iframe src="${esc(embedVideoUrl)}" title="فيديو الإهداء" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+        </div>` : '';
 
-            // تجهيز زر درايف إذا وُجد
-            let driveBtnHtml = '';
-            if (driveUrl) {
-                driveBtnHtml = `
-        <a href="${driveUrl}" target="_blank" class="btn-drive">
+            const driveBtnHtml = driveUrl ? `
+        <a href="${esc(driveUrl)}" target="_blank" rel="noopener noreferrer" class="btn-drive">
             <span>📁 عرض الذكريات والملفات</span>
-        </a>`;
-            }
+        </a>` : '';
 
-            // كود الصفحة المنتجة
+            // الصوت: شاشة فتح (المتصفحات تمنع التشغيل التلقائي) + زر تحكم عائم
+            const audioHtml = audioSrc ? `
+    <div class="opener" id="opener">
+        ${emblemSvg(110)}
+        <p class="opener-occ">${O}</p>
+        <p class="opener-to">إلى ${R}</p>
+        <button type="button" class="opener-btn">افتح الإهداء</button>
+    </div>
+    <audio id="giftAudio" src="${esc(audioSrc)}" preload="auto"${audioLoop ? ' loop' : ''}></audio>
+    <button type="button" class="audio-toggle" id="audioToggle" aria-pressed="false">
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="lbl">تشغيل الصوت</span>
+    </button>` : '';
+
+            const audioScript = audioSrc ? `
+    <script>
+    (function () {
+        var a = document.getElementById('giftAudio');
+        var ov = document.getElementById('opener');
+        var tg = document.getElementById('audioToggle');
+        function sync() {
+            var on = !a.paused;
+            tg.setAttribute('aria-pressed', on);
+            tg.classList.toggle('playing', on);
+            tg.querySelector('.lbl').textContent = on ? 'إيقاف الصوت' : 'تشغيل الصوت';
+        }
+        ov.querySelector('button').addEventListener('click', function () {
+            a.play().catch(function () {});
+            ov.classList.add('hide');
+            setTimeout(function () { ov.remove(); }, 600);
+        });
+        tg.addEventListener('click', function () {
+            if (a.paused) { a.play().catch(function () {}); } else { a.pause(); }
+        });
+        a.addEventListener('play', sync);
+        a.addEventListener('pause', sync);
+        // إيقاف الصوت تلقائياً عند الضغط على الفيديو
+        window.addEventListener('blur', function () {
+            setTimeout(function () {
+                var el = document.activeElement;
+                if (el && el.tagName === 'IFRAME') a.pause();
+            }, 0);
+        });
+    })();
+    <\/script>` : '';
+
             const generatedHtml = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إهداء إلى ${recipient}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>إهداء إلى ${R}</title>
+    <meta name="description" content="${desc}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="إهداء إلى ${R}">
+    <meta property="og:description" content="${O} — من ${S}">${ogImage}
+    <meta name="theme-color" content="#0f172a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Cairo:wght@400;700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=${font.q}&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-color: #0f172a; --card-bg: rgba(30, 41, 59, 0.85); --accent: ${themeColor}; --text-main: #f8fafc; --text-muted: #94a3b8; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: ${fontFamily}; }
-        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background-image: radial-gradient(circle at 50% 10%, ${themeColor}22 0%, transparent 60%); }
+        :root { --bg-color: #0f172a; --card-bg: rgba(30, 41, 59, 0.85); --accent: ${themeColor}; --on-accent: ${btnText}; --text-main: #f8fafc; --text-muted: #94a3b8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: ${font.css}; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); background-image: radial-gradient(circle at 50% 10%, ${themeColor}22 0%, transparent 60%); }
         .container { width: 100%; max-width: 480px; background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 28px 20px; text-align: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
         .badge { display: inline-block; padding: 6px 16px; background: ${themeColor}20; color: var(--accent); border: 1px solid ${themeColor}40; border-radius: 50px; font-size: 14px; font-weight: 700; margin-bottom: 16px; }
-        .title { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+        .title { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 6px; overflow-wrap: anywhere; }
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
         .cover-wrapper { position: relative; width: 100%; height: 200px; border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid ${themeColor}40; box-shadow: 0 8px 20px ${themeColor}20; }
-        .cover-image { width: 100%; height: 100%; object-fit: cover; }
-        .message-box { background: rgba(15, 23, 42, 0.6); border-right: 4px solid var(--accent); padding: 16px 18px; border-radius: 12px; text-align: right; font-size: 15px; line-height: 1.8; color: #e2e8f0; margin-bottom: 20px; white-space: pre-line; }
+        .cover-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* بدون صورة: زخرفة بين خطين */
+        .ornament { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 22px; }
+        .ornament::before, .ornament::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to left, transparent, ${themeColor}80); }
+        .ornament::after { background: linear-gradient(to right, transparent, ${themeColor}80); }
+        .emblem { display: block; flex-shrink: 0; }
+        .ornament .emblem { animation: spin 60s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .message-box { background: rgba(15, 23, 42, 0.6); border-right: 4px solid var(--accent); padding: 16px 18px; border-radius: 12px; text-align: right; font-size: 15px; line-height: 1.8; color: #e2e8f0; margin-bottom: 20px; white-space: pre-line; overflow-wrap: anywhere; }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; margin-bottom: 20px; border: 1px solid ${themeColor}60; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0; }
-        .btn-drive { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: var(--accent); color: #ffffff; text-decoration: none; padding: 14px 20px; font-size: 16px; font-weight: 700; border-radius: 14px; box-shadow: 0 10px 25px ${themeColor}30; margin-top: 10px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .btn-drive { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: var(--accent); color: var(--on-accent); text-decoration: none; padding: 14px 20px; font-size: 16px; font-weight: 700; border-radius: 14px; box-shadow: 0 10px 25px ${themeColor}30; margin-top: 10px; }
         .footer { margin-top: 24px; font-size: 12px; color: var(--text-muted); opacity: 0.7; }
+
+        /* شاشة الفتح */
+        .opener { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; background: var(--bg-color); background-image: radial-gradient(circle at 50% 40%, ${themeColor}30 0%, transparent 65%); transition: opacity .6s ease, transform .6s ease; }
+        .opener.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
+        .opener .emblem { animation: spin 40s linear infinite; margin-bottom: 8px; }
+        .opener-occ { color: var(--accent); font-size: 15px; font-weight: 700; }
+        .opener-to { font-size: 24px; font-weight: 800; margin-bottom: 18px; text-align: center; overflow-wrap: anywhere; }
+        .opener-btn { background: var(--accent); color: var(--on-accent); border: none; padding: 14px 40px; font-size: 17px; font-weight: 700; border-radius: 50px; cursor: pointer; box-shadow: 0 0 0 0 ${themeColor}80; animation: pulse 2s infinite; }
+        @keyframes pulse { 70% { box-shadow: 0 0 0 16px ${themeColor}00; } 100% { box-shadow: 0 0 0 0 ${themeColor}00; } }
+
+        /* زر الصوت العائم */
+        .audio-toggle { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 16px; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(15, 23, 42, 0.9); color: var(--text-main); border: 1px solid ${themeColor}60; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .bars { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+        .bars i { width: 3px; height: 4px; background: var(--accent); border-radius: 2px; }
+        .audio-toggle.playing .bars i { animation: eq .9s ease-in-out infinite; }
+        .audio-toggle.playing .bars i:nth-child(2) { animation-delay: .2s; }
+        .audio-toggle.playing .bars i:nth-child(3) { animation-delay: .4s; }
+        @keyframes eq { 50% { height: 14px; } }
+
+        button:focus-visible, a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="badge">${occasion}</div>
-        <h1 class="title">إلى ${recipient} ❤️</h1>
-        <p class="subtitle">إهداء مقدم من: ${sender}</p>
-
-        <div class="cover-wrapper">
-            <img src="${coverSrc}" alt="الغلاف" class="cover-image">
-        </div>
-
-        <div class="message-box">${message}</div>
-
-        ${videoSectionHtml}
-
-        ${driveBtnHtml}
-
-        <div class="footer">
-            تمت البرمجة بحب ✦ NFC Gift
-        </div>
-    </div>
+    ${audioHtml}
+    <main class="container">
+        <div class="badge">${O}</div>
+        <h1 class="title">إلى ${R}</h1>
+        <p class="subtitle">إهداء مقدم من: ${S}</p>
+${coverHtml}
+        <div class="message-box">${M}</div>
+${videoSectionHtml}
+${driveBtnHtml}
+        <div class="footer">تمت البرمجة بحب ✦ NFC Gift</div>
+    </main>
+${audioScript}
 </body>
 </html>`;
 
-            const blob = new Blob([generatedHtml], { type: 'text/html;charset=utf-8;' });
+            const blob = new Blob([generatedHtml], { type: 'text/html;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'index.html';
+            document.body.appendChild(link);
             link.click();
-            URL.revokeObjectURL(link.href);
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(link.href), 1500);
+            $('submitBtn').disabled = false;
         });
     </script>
 </body>
